@@ -1,0 +1,8 @@
+### IDE and editors
+.idea/
+.vscode/
+
+### Generated stuff
+
+__pycache__/
+*.py[co]
