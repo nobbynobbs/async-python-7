@@ -54,7 +54,7 @@ ROUTES_COUNT = 595
     type=float,
     default=.1,
     envvar="BUS_EMULATOR_TIMEOUT",
-    help="set coordinates updating frequency"
+    help="set coordinates update frequency"
 )
 @click.option(
     "-v",

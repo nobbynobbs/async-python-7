@@ -20,6 +20,10 @@ services:
     build:
       context: ../bus-tracker-backend
       dockerfile: build/Dockerfile
+    environment:
+      BUS_EMULATOR_SERVER: "ws://tracker:8080"
+      BUS_EMULATOR_BUSES_PER_ROUTE: 4
+      BUS_EMULATOR_TIMEOUT: 1
     command: ["emulator"]
     depends_on:
       - tracker
