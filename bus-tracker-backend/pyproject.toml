@@ -8,14 +8,14 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "3.7"
 trio-websocket = "^0.8.0"
+
+[tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
 mypy = "^0.761"
 
-[tool.poetry.dev-dependencies]
-
 [tool.poetry.scripts]
 bus-tracker = "bus_tracker.server:main"
-run-buses = "bus_tracker.buses.server:main"
+emulator = "bus_tracker.emulator.server:main"
 
 [build-system]
 requires = ["poetry>=0.12"]

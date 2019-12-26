@@ -2,7 +2,30 @@ version: "3"
 services:
   frontend:
     build:
-      context: ../frontend
+      context: ../bus-tracker-frontend
       dockerfile: build/Dockerfile
     ports:
     - 3000:80
+
+  tracker:
+    build:
+      context: ../bus-tracker-backend
+      dockerfile: build/Dockerfile
+    ports:
+    - 8000:8000
+    networks:
+      tracker-network:
+
+  emulator:
+    build:
+      context: ../bus-tracker-backend
+      dockerfile: build/Dockerfile
+    command: ["emulator"]
+    depends_on:
+      - tracker
+    networks:
+      tracker-network:
+
+
+networks:
+  tracker-network:
