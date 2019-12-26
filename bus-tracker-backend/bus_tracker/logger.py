@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger("bus-tracker")
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)
 
 # create formatter
 formatter = logging.Formatter(
