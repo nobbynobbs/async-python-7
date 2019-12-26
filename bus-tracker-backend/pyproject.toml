@@ -15,7 +15,7 @@ flake8 = "^3.7.9"
 mypy = "^0.761"
 
 [tool.poetry.scripts]
-bus-tracker = "bus_tracker.server:main"
+bus-tracker = "bus_tracker.main:main"
 emulator = "bus_tracker.emulator.main:main"
 
 [build-system]
