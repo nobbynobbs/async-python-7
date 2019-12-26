@@ -20,8 +20,8 @@ ROUTES_COUNT = 595
 @click.option(
     "-r",
     "--routes_count",
-    type=int,
-    default=click.IntRange(min=1, max=ROUTES_COUNT),
+    type=click.IntRange(min=1, max=ROUTES_COUNT),
+    default=ROUTES_COUNT,
     envvar="BUS_EMULATOR_ROUTES",
     help="count of different routes"
 )

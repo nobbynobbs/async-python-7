@@ -24,27 +24,34 @@ async def update_bounds(
     while True:
         try:
             message = json.loads(await ws.get_message())
+            logger.debug("received from client %s", message)
+            bounds.update(message["data"])
+            await send_buses(ws, bounds)
         except json.JSONDecodeError:
             pass
-        else:
-            bounds.update(message["data"])
+        except ConnectionClosed:
+            break
 
 
-async def send_buses(
+async def send_buses(ws: WebSocketConnection, bounds: Dict[str, float]):
+    async with buses_lock:
+        buses_list = list(buses.values())
+    if bounds:
+        buses_list = [bus for bus in buses_list if in_box(bounds, bus)]
+    await ws.send_message(
+        json.dumps({
+            "msgType": "Buses",
+            "buses": buses_list,
+        })
+    )
+
+
+async def send_buses_loop(
         ws: WebSocketConnection, bounds: Dict[str, float]
 ) -> None:
     while True:
         try:
-            async with buses_lock:
-                buses_list = list(buses.values())
-            if bounds:
-                buses_list = [bus for bus in buses_list if in_box(bounds, bus)]
-            await ws.send_message(
-                json.dumps({
-                    "msgType": "Buses",
-                    "buses": buses_list,
-                })
-            )
+            await send_buses(ws, bounds)
         except ConnectionClosed:
             break
         await trio.sleep(1)
@@ -53,9 +60,11 @@ async def send_buses(
 async def handle_weblients(request: WebSocketRequest) -> None:
     ws = await request.accept()
     bounds: Dict[str, float] = {}
+    logger.debug("accept webclient connection")
     async with trio.open_nursery() as nursery:
         nursery.start_soon(update_bounds, ws, bounds)
-        nursery.start_soon(send_buses, ws, bounds)
+        nursery.start_soon(send_buses_loop, ws, bounds)
+    logger.debug("webclient connection closed")
 
 
 async def handle_tracking(request: WebSocketRequest) -> None:
