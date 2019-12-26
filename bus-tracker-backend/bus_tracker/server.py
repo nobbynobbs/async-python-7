@@ -7,9 +7,8 @@ from trio_websocket import (
     ConnectionClosed, WebSocketRequest, WebSocketConnection,
 )
 
-from bus_tracker.logger import logger
 from bus_tracker.json_encoder import dumps
-
+from bus_tracker.logger import get_logger
 
 MIN_LAT: float = -90  # south pole
 MAX_LAT: float = +90  # north pole
@@ -18,6 +17,7 @@ MAX_LNG: float = +180  # east
 
 
 buses: Dict[str, Any] = {}
+logger = get_logger()
 
 
 @dataclasses.dataclass()
@@ -26,10 +26,6 @@ class Bus:
     route: str
     lat: float
     lng: float
-
-    @classmethod
-    def from_dict(cls, bus_info: Dict[str, Any]) -> "Bus":
-        return cls(**bus_info)
 
     @property
     def position(self) -> Tuple[float, float]:
@@ -109,7 +105,9 @@ async def handle_tracking(request: WebSocketRequest) -> None:
         try:
             message = await ws.get_message()
             logger.debug("received bus info: %s", message)
-            bus_info = json.loads(message)
-            buses[bus_info["busId"]] = Bus.from_dict(bus_info)
+            bus = Bus(**json.loads(message))
+            buses[bus.busId] = bus
+        except json.JSONDecodeError:
+            logger.warning("received broken json")
         except ConnectionClosed:
             break

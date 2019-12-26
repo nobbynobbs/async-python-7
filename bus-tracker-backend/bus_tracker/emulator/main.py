@@ -2,7 +2,7 @@ import contextlib
 
 import asyncclick as click
 from bus_tracker.emulator.server import serve
-from bus_tracker.logger import logger
+from bus_tracker.logger import set_logger
 
 ROUTES_COUNT = 595
 
@@ -71,13 +71,7 @@ async def main(
         refresh_timeout: float,
         verbose: int
 ) -> None:
-
-    if verbose < 1:
-        logger.setLevel("WARNING")
-    if verbose == 1:
-        logger.setLevel("INFO")
-    if verbose > 1:
-        logger.setLevel("DEBUG")
+    set_logger(verbose)
 
     with contextlib.suppress(KeyboardInterrupt):
         await serve(

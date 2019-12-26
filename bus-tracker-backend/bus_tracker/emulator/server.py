@@ -10,13 +10,14 @@ from typing import List, Optional, Tuple, AsyncIterable, TYPE_CHECKING
 import trio
 from trio_websocket import open_websocket_url
 
-from bus_tracker.logger import logger
-
+from bus_tracker.logger import get_logger
 from . import BASE_DIR
 from .utils import load_routes, generate_bus_id, reconnect
 
 if TYPE_CHECKING:
     from typing_extensions import TypedDict
+
+logger = get_logger(__name__)
 
 
 @dataclasses.dataclass()
@@ -50,7 +51,6 @@ async def run_bus(
     )
     for coordinate in itertools.cycle(route["coordinates"]):
         bus_info.lat, bus_info.lng = coordinate
-        # logging.debug(dataclasses.asdict(bus_info))
         yield bus_info
         await trio.sleep(refresh_timeout)
 

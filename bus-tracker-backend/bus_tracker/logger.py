@@ -1,17 +1,30 @@
 import logging
+from typing import Optional
 
-logger = logging.getLogger("bus-tracker")
-logger.setLevel(logging.INFO)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+DEFAULT_APP_LOGGER = "bus-tracker"
 
-# create formatter
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 
-# add formatter to ch
-ch.setFormatter(formatter)
+def set_logger(verbose: int, name: str = DEFAULT_APP_LOGGER) -> None:
+    level = logging.WARNING
+    if verbose == 1:
+        level = logging.INFO
+    if verbose > 1:
+        level = logging.DEBUG
 
-# add ch to logger
-logger.addHandler(ch)
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+
+def get_logger(suffix: Optional[str] = None) -> logging.Logger:
+    logger = logging.getLogger(DEFAULT_APP_LOGGER)
+    if suffix is None:
+        return logger
+    return logger.getChild(suffix)

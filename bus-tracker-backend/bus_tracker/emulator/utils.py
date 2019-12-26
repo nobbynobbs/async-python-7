@@ -4,8 +4,11 @@ import json
 from typing import Generator, Any, Callable, Awaitable
 
 import trio
-from bus_tracker.logger import logger
+from bus_tracker.logger import get_logger
 from trio_websocket import HandshakeError, ConnectionClosed
+
+
+logger = get_logger(__name__)
 
 
 def load_routes(directory_path: str = 'routes') -> Generator[Any, None, None]:

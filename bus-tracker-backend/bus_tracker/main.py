@@ -3,7 +3,7 @@ import functools
 
 import asyncclick as click
 import trio
-from bus_tracker.logger import logger
+from bus_tracker.logger import set_logger, get_logger
 from bus_tracker.server import handle_tracking, handle_weblients
 from trio_websocket import serve_websocket
 
@@ -30,13 +30,8 @@ from trio_websocket import serve_websocket
     help="verbosity",
 )
 async def main(bus_port: int, browser_port: int, verbose: int) -> None:
-    if verbose < 1:
-        logger.setLevel("WARNING")
-    if verbose == 1:
-        logger.setLevel("INFO")
-    if verbose > 1:
-        logger.setLevel("DEBUG")
-
+    set_logger(verbose)
+    logger = get_logger(__name__)
     serve_buses = functools.partial(
         serve_websocket,
         handler=handle_tracking,
@@ -52,7 +47,10 @@ async def main(bus_port: int, browser_port: int, verbose: int) -> None:
         port=browser_port,
         ssl_context=None
     )
+
+    logger.info("starting service")
     with contextlib.suppress(KeyboardInterrupt):
         async with trio.open_nursery() as nursery:
             nursery.start_soon(serve_buses)
             nursery.start_soon(serve_webclients)
+    logger.info("service stopped")
