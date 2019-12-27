@@ -13,4 +13,4 @@ mypy:
 	poetry run mypy -p bus_tracker
 
 tests:
-	pytest tests --cov=bus_tracker/tracker
+	poetry run pytest tests --cov=bus_tracker/tracker
