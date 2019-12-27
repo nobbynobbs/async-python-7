@@ -13,9 +13,12 @@ asyncclick = "^7.0.9"
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
 mypy = "^0.761"
+pytest = "^5.3.2"
+pytest-cov = "^2.8.1"
+pytest-trio = "^0.5.2"
 
 [tool.poetry.scripts]
-bus-tracker = "bus_tracker.main:main"
+bus-tracker = "bus_tracker.tracker.main:main"
 emulator = "bus_tracker.emulator.main:main"
 
 [build-system]

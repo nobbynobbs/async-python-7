@@ -3,9 +3,10 @@ import functools
 
 import asyncclick as click
 import trio
-from bus_tracker.logger import set_logger, get_logger
-from bus_tracker.server import handle_tracking, handle_weblients
 from trio_websocket import serve_websocket
+
+from bus_tracker.logger import set_logger, get_logger
+from .server import handle_tracking, handle_weblients
 
 
 @click.command()
