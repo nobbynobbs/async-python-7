@@ -18,9 +18,11 @@ jobs:
           make install-dev
       - name: Lint with flake8
         run: |
+          cd bus-tracker-backend
           make lint
       - name: Check typing with mypy
         run: |
+          cd bus-tracker-backend
           make mypy
 
   tests:
@@ -40,4 +42,5 @@ jobs:
         make install-dev
     - name: Test with pytest
       run: |
+        cd bus-tracker-backend
         make tests
