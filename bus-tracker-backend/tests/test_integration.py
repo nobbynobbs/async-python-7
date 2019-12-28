@@ -6,6 +6,7 @@ from trio_websocket import WebSocketConnection
 async def test_integration(
         webclient_socket: WebSocketConnection,
         tracking_socket: WebSocketConnection,
+        autojump_clock
 ):
     buses_msg = await webclient_socket.get_message()
     assert json.loads(buses_msg) == {"msgType": "Buses", "buses": []}
