@@ -7,6 +7,7 @@ import trio
 from bus_tracker.logger import get_logger
 from trio_websocket import HandshakeError, ConnectionClosed
 
+from .ctx import worker_index
 
 logger = get_logger(__name__)
 
@@ -41,8 +42,10 @@ def reconnect(func: AsyncFunction) -> AsyncFunction:
             try:
                 await func(*args, **kwargs)
             except (HandshakeError, ConnectionClosed):
-                msg = "cannot connect to server, reconnect in %d seconds"
-                logger.warning(msg, 1)
+                index = worker_index.get()
+                msg = ("worker #%d cannot connect to server, "
+                       "reconnect in %d seconds")
+                logger.warning(msg, index,  1)
                 await trio.sleep(1)
             else:
                 break

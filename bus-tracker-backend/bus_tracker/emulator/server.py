@@ -13,6 +13,7 @@ from trio_websocket import open_websocket_url
 from bus_tracker.logger import get_logger
 from . import BASE_DIR
 from .utils import load_routes, generate_bus_id, reconnect
+from .ctx import worker_index
 
 if TYPE_CHECKING:
     from typing_extensions import TypedDict
@@ -72,16 +73,19 @@ async def send_route_info(
 
 
 @reconnect
-async def send_messages(url: str, channel: trio.MemoryReceiveChannel) -> None:
-    logger.info("starting messages sender")
+async def send_messages(
+        worker_id: int, url: str, channel: trio.MemoryReceiveChannel
+) -> None:
+    logger.info("starting messages sender #%d", worker_id)
+    worker_index.set(worker_id)  # save worker id in context
     async with open_websocket_url(url) as ws:
-        logger.debug("successfully connected to %s", url)
+        logger.debug("#%d successfully connected to %s", worker_id, url)
         # we have "eternal" consumer which must be
         # able to reconnect, so we don't use ```async with channel``` here
         # if we do, we cannot reuse channel on reconnect - it would be closed
         async for message in channel:
             await ws.send_message(message)
-    logger.info("messages sender finished")
+    logger.info("messages sender #%d finished", worker_id)
 
 
 async def serve(
@@ -115,5 +119,5 @@ async def serve(
                     )
                     nursery.start_soon(partial_send_info)
 
-        for _ in range(concurrency):
-            nursery.start_soon(send_messages, url, receive_channel)
+        for index in range(concurrency):
+            nursery.start_soon(send_messages, index, url, receive_channel)
