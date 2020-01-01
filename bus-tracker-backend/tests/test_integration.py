@@ -26,7 +26,7 @@ async def test_integration(
     }))
 
     buses = json.loads(await webclient_socket.get_message())
-    assert len(buses["buses"]) == 2
+    assert len(buses["buses"]) == 0
 
     bounds = {
         "msgType": "newBounds",

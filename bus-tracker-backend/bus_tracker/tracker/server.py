@@ -57,23 +57,28 @@ async def _send_buses(ws: WebSocketConnection, bounds: WindowBounds) -> None:
 
 
 async def _talk_to_browser(
-        ws: WebSocketConnection, bounds: WindowBounds
+        ws: WebSocketConnection,
+        bounds: WindowBounds,
+        timeout: float,
 ) -> None:
     while True:
         try:
             await _send_buses(ws, bounds)
         except ConnectionClosed:
             break
-        await trio.sleep(1)
+        await trio.sleep(timeout)
 
 
-async def handle_weblients(request: WebSocketRequest) -> None:
+async def handle_weblients(
+        request: WebSocketRequest,
+        timeout: float = 1,
+) -> None:
     ws = await request.accept()
     bounds = WindowBounds()
     logger.debug("accept webclient connection")
     async with trio.open_nursery() as nursery:
         nursery.start_soon(_listen_browser, ws, bounds)
-        nursery.start_soon(_talk_to_browser, ws, bounds)
+        nursery.start_soon(_talk_to_browser, ws, bounds, timeout)
     logger.debug("webclient connection closed")
 
 

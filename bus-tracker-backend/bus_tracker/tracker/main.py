@@ -25,12 +25,22 @@ from .server import handle_tracking, handle_weblients
     help="listen for service clients"
 )
 @click.option(
+    "--timeout",
+    "-t",
+    type=float,
+    default=1.0,
+    envvar="BUS_TRACKER_TIMEOUT",
+    help="response to browser interval"
+)
+@click.option(
     "-v",
     "--verbose",
     count=True,
     help="verbosity",
 )
-async def main(bus_port: int, browser_port: int, verbose: int) -> None:
+async def main(
+        bus_port: int, browser_port: int, timeout: float, verbose: int
+) -> None:
     set_logger(verbose)
     logger = get_logger(__name__)
     serve_buses = functools.partial(
@@ -41,9 +51,11 @@ async def main(bus_port: int, browser_port: int, verbose: int) -> None:
         ssl_context=None
     )
 
+    handler = functools.partial(handle_weblients, timeout=timeout)
+
     serve_webclients = functools.partial(
         serve_websocket,
-        handler=handle_weblients,
+        handler=handler,
         host='0.0.0.0',
         port=browser_port,
         ssl_context=None

@@ -2,13 +2,16 @@
 name = "bus-tracker"
 version = "0.1.0"
 description = "playing with trio and websockets on educational purposes"
-authors = ["Your Name <you@example.com>"]
+authors = ["Roman Bolkhovitin <you@example.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 trio-websocket = "^0.8.0"
 asyncclick = "^7.0.9"
+anyio = "1.2.1"  # 1.2.2 brokes asyncclick
+dataclasses = { version = "*", python = "~3.6" }  # dataclasses backport
+
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
