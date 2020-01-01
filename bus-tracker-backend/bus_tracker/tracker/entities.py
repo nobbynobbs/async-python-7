@@ -21,10 +21,11 @@ class Bus:
 
 @dataclasses.dataclass
 class WindowBounds:
+    # zero area by default
     south_lat: float = MIN_LAT
-    north_lat: float = MAX_LAT
+    north_lat: float = MIN_LAT
     west_lng: float = MIN_LNG
-    east_lng: float = MAX_LNG
+    east_lng: float = MIN_LNG
 
     def update(
             self,
