@@ -39,5 +39,7 @@ class WindowBounds:
         self.east_lng = east_lng
 
     def contains(self, lat: float, lng: float) -> bool:
-        return (self.south_lat < lat < self.north_lat
-                and self.west_lng < lng < self.east_lng)
+        # it should work for all quadrants
+        min_lat, max_lat = sorted([self.south_lat, self.north_lat])
+        min_lng, max_lng = sorted([self.east_lng, self.west_lng])
+        return min_lat < lat < max_lat and min_lng < lng < max_lng
