@@ -52,6 +52,39 @@ poetry run bus-tracker
 Вместо скриптов, которые должны отправлять в сервис испорченные данные,
 написаны тесты. Функционал веб-сокет сервера (бекэнда), покрыт полностью.
 
+## Факультатив :)
+
+Производительность реализованного "эмулятора" мне показалась неприлично низкой,
+поэтому в докере он запускается в `pypy`, но даже там ворочается не очень охотно.
+
+Из любопытства я переписал его сначала на Го, потом на нативный `asyncio`.
+Имплементацию на Го возможно запушу позже, потому что писалось быстро и грязно,
+а реализацию с нативным `asyncio` можно найти в соседней ветке.
+
+И она работает заметно быстрее, причем без `pypy` и даже если запускать
+в обычном лупе, а не в `uvloop`. Никаких объективных замеров я не делал,
+но это видно невооруженным глазом.
+
+Пока напрашивается вывод, что концептуально `trio` очень красивый, на нем приятно писать,
+а эссе в блоге Натаниэля Смита очень интересно читать, но производительность
+эвент-лупа `trio` оставляет желать лучшего и в узких местах его не поставишь.
+
+Еще заметил, что имплементация `nursery` в `aionursery` кривая,
+в том смысле, что она предоставляет интерфейс, отличающийся от `nursery` в `trio`.
+В частности `start_soon` в `aionursery` принимает корутину,
+а нативные `nursery` - асинхронную функцию с параметрами.
+
+И это различие важно, потому что:
+
+> ... there is one subtlety here that pushes Trio towards different conventions
+> than asyncio or some other libraries: it means that `start_soon` has to take
+> a function, not a coroutine object or a Future. (You can call a function
+> multiple times, but there's no way to restart a coroutine object or a Future.)
+> I think this is the better convention anyway for a number of reasons
+> (especially since Trio doesn't even have Futures!), but still, worth mentioning
+>
+> [Notes on structured concurrency, or: Go statement considered harmful](https://vorpus.org/blog/notes-on-structured-concurrency-or-go-statement-considered-harmful/#you-can-define-new-types-that-quack-like-a-nursery)
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python
