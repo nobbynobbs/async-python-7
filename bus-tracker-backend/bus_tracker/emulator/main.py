@@ -1,12 +1,15 @@
 import contextlib
 
 import asyncclick as click
+
 from bus_tracker.emulator.server import serve
+from bus_tracker.emulator.utils import with_backend
 from bus_tracker.logger import set_logger
 
 ROUTES_COUNT = 595
 
 
+@with_backend("asyncio")
 @click.command()
 @click.option(
     "-s",
@@ -72,7 +75,6 @@ async def main(
         verbose: int
 ) -> None:
     set_logger(verbose)
-
     with contextlib.suppress(KeyboardInterrupt):
         await serve(
             url=url,

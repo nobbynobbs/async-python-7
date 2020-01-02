@@ -6,11 +6,14 @@ authors = ["Roman Bolkhovitin <you@example.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.6.1,<4.0"
 trio-websocket = "^0.8.0"
 asyncclick = "^7.0.9"
 anyio = "1.2.1"  # 1.2.2 brokes asyncclick
 dataclasses = { version = "*", python = "~3.6" }  # dataclasses backport
+websockets = "^8.1"
+aionursery = "^0.3.0"
+uvloop = "^0.14.0"
 
 
 [tool.poetry.dev-dependencies]

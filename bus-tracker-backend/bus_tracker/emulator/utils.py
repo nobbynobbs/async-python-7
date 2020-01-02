@@ -1,13 +1,17 @@
+import asyncio
 import functools
 import os
 import json
-from typing import Generator, Any, Callable, Awaitable
+from typing import Generator, Any, Callable, Awaitable, TYPE_CHECKING
 
-import trio
+import uvloop
+from websockets.exceptions import ConnectionClosedError
+
 from bus_tracker.logger import get_logger
-from trio_websocket import HandshakeError, ConnectionClosed
-
 from .ctx import worker_index
+
+if TYPE_CHECKING:
+    from typing_extensions import Literal
 
 logger = get_logger(__name__)
 
@@ -41,12 +45,33 @@ def reconnect(func: AsyncFunction) -> AsyncFunction:
         while True:
             try:
                 await func(*args, **kwargs)
-            except (HandshakeError, ConnectionClosed):
+            except (ConnectionError, ConnectionClosedError):
                 index = worker_index.get()
                 msg = ("worker #%d cannot connect to server, "
                        "reconnect in %d seconds")
                 logger.warning(msg, index,  1)
-                await trio.sleep(1)
+                await asyncio.sleep(1)
             else:
                 break
     return wrapper
+
+
+if TYPE_CHECKING:
+    BackendLiteral = Literal["asyncio", "trio", "curio"]
+else:
+    BackendLiteral = None
+
+
+def with_backend(backend: BackendLiteral) -> Callable:
+    """
+    asycnclick and anyio want to use "trio".
+    I don't
+    """
+    def decorator(func: Callable) -> Callable:
+        if backend == "asyncio":
+            uvloop.install()
+        return functools.partial(
+            func,
+            _anyio_backend=backend
+        )
+    return decorator
