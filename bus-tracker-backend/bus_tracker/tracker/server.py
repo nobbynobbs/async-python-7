@@ -65,7 +65,7 @@ async def _talk_to_browser(
         await trio.sleep(timeout)
 
 
-async def handle_weblients(
+async def handle_webclients(
         request: WebSocketRequest,
         timeout: float = 1,
 ) -> None:

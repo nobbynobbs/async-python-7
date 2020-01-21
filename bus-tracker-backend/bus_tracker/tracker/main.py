@@ -6,7 +6,7 @@ import trio
 from trio_websocket import serve_websocket
 
 from bus_tracker.logger import set_logger, get_logger
-from .server import handle_tracking, handle_weblients
+from .server import handle_tracking, handle_webclients
 
 
 @click.command()
@@ -51,7 +51,7 @@ async def main(
         ssl_context=None
     )
 
-    handler = functools.partial(handle_weblients, timeout=timeout)
+    handler = functools.partial(handle_webclients, timeout=timeout)
 
     serve_webclients = functools.partial(
         serve_websocket,

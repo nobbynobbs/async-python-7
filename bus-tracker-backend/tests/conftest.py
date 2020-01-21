@@ -8,7 +8,7 @@ from trio_websocket import (
     serve_websocket, open_websocket_url, WebSocketConnection
 )
 
-from bus_tracker.tracker.server import handle_weblients, handle_tracking
+from bus_tracker.tracker.server import handle_webclients, handle_tracking
 
 
 @pytest.fixture(scope="session")
@@ -27,7 +27,7 @@ async def webclient_socket(
     port = unused_port()
     server = functools.partial(
         serve_websocket,
-        handler=handle_weblients,
+        handler=handle_webclients,
         host='127.0.0.1',
         port=port,
         ssl_context=None
