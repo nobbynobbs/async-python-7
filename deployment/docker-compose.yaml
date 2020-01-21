@@ -24,7 +24,8 @@ services:
       dockerfile: build/Dockerfile
     environment:
       BUS_EMULATOR_SERVER: "ws://tracker:8080"
-      BUS_EMULATOR_BUSES_PER_ROUTE: 10
+#      BUS_EMULATOR_ROUTES: 1  # default == max == 595
+      BUS_EMULATOR_BUSES_PER_ROUTE: 5
       BUS_EMULATOR_TIMEOUT: "0.3"
     command: ["emulator"]
     depends_on:

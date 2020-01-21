@@ -1,4 +1,3 @@
-import copy
 import dataclasses
 import functools
 import itertools
@@ -41,6 +40,7 @@ else:
 
 async def run_bus(
         route: RouteInfo,
+        start_offset: int = 0,
         bus_index: int = None,
         emulator_id: str = "",
         refresh_timeout: float = .1,
@@ -50,21 +50,29 @@ async def run_bus(
         busId=generate_bus_id(route_name, bus_index, emulator_id),
         route=route_name,
     )
-    for coordinate in itertools.cycle(route["coordinates"]):
-        bus_info.lat, bus_info.lng = coordinate
-        yield bus_info
-        await trio.sleep(refresh_timeout)
+    while True:
+        coordinates = itertools.islice(
+            route["coordinates"],
+            start_offset,
+            len(route["coordinates"]),
+        )
+        for coordinate in coordinates:
+            bus_info.lat, bus_info.lng = coordinate
+            yield bus_info
+            await trio.sleep(refresh_timeout)
+        start_offset = 0
 
 
 async def send_route_info(
         route: RouteInfo,
+        start_offset: int,
         bus_index: int,
         emulator_id: str,
         refresh_timeout: float,
         channel: trio.MemorySendChannel
 ) -> None:
     bus_info_generator = run_bus(
-        route, bus_index, emulator_id, refresh_timeout
+        route, start_offset, bus_index, emulator_id, refresh_timeout
     )
     async with channel:
         async for bus_position_info in bus_info_generator:
@@ -104,14 +112,14 @@ async def serve(
         async with send_channel:
             for route_index, route in routes_generator:
                 for bus_index in range(buses_per_route):
-                    route = copy.copy(route)
                     bus_id_suffix = route_index * buses_per_route + bus_index
-                    coordinates = route["coordinates"]
-                    start_offset = random.randint(0, 2 * len(coordinates) // 3)
-                    route["coordinates"] = coordinates[start_offset:]
+                    start_offset = random.randrange(
+                        0, 2 * len(route["coordinates"]) // 3
+                    )
                     partial_send_info = functools.partial(
                         send_route_info,
                         route=route,
+                        start_offset=start_offset,
                         bus_index=bus_id_suffix,
                         emulator_id=emulator_id,
                         refresh_timeout=refresh_timeout,
